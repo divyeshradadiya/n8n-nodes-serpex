@@ -2,7 +2,7 @@
 
 This is an n8n community node that lets you use [Serpex](https://serpex.dev) in your n8n workflows.
 
-Serpex provides real-time search results from multiple search engines including Google, Bing, DuckDuckGo, Brave, Yahoo, and Yandex through a simple API.
+**Serpex** is a fast, affordable search API that provides structured search results with intelligent routing, automatic retries, and comprehensive data extraction. **10x cheaper than competitors** - Pricing starts at just $0.0008 per request.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
@@ -45,13 +45,13 @@ RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-serpex
 ## Operations
 
 ### Search
-- **Execute**: Perform a search query across multiple search engines
+- **Execute**: Perform a search query with intelligent routing and structured JSON responses
 
 ## Credentials
 
 To use this node, you need to set up Serpex API credentials:
 
-1. Get your API key from [Serpex Dashboard](https://serpex.dev/dashboard)
+1. Get your API key from [Serpex Dashboard](https://serpex.dev/dashboard) (200 free searches to get started)
 2. In n8n, create new credentials and select **Serpex API**
 3. Enter your API key
 
@@ -70,11 +70,20 @@ Tested against n8n version 1.0.0 and above.
 
 ### Advanced Options
 
-- **Engine**: Choose specific search engine (auto, google, bing, duckduckgo, brave, yahoo, yandex)
+- **Engine**: Choose search engine (auto, google, bing, duckduckgo, etc.)
 - **Time Range**: Filter results by time (all, day, week, month, year)
-- **Number of Results**: Specify how many results to return (1-100)
-- **Location**: Set geographic location for localized results
-- **Language**: Set language code for results (e.g., en, es, fr)
+- **Number of Results**: Specify how many results to return (1-50)
+- **Safe Search**: Enable safe search filtering
+
+### Parameters
+
+| Parameter | Type | Required | Description | Example |
+|-----------|------|----------|-------------|---------|
+| q | string | Yes | Search query | "coffee shops near me" |
+| category | string | No | Search category (currently 'web' only) | "web" |
+| time_range | string | No | Time filter | "day" |
+| num | number | No | Number of results (max 50) | 10 |
+| safe_search | boolean | No | Enable safe search | true |
 
 ### Example Workflow
 
@@ -84,12 +93,11 @@ Manual Trigger → Serpex (Search for "AI tools") → Process Results → Send E
 
 ### Response Data
 
-The node returns search results in JSON format including:
-- Organic search results
-- Featured snippets
+The node returns search results in structured JSON format including:
+- Organic search results with position, title, link, snippet
 - Related searches
 - People also ask
-- And more depending on the search engine
+- Search metadata
 
 ## Resources
 
@@ -102,11 +110,12 @@ The node returns search results in JSON format including:
 ### 1.0.0
 
 Initial release with support for:
-- Multi-engine search (Google, Bing, DuckDuckGo, Brave, Yahoo, Yandex)
+- Intelligent auto-routing with automatic retries
+- Multi-engine support (Auto Route, Google, Bing, DuckDuckGo, etc.)
 - Time range filtering
-- Location-based results
-- Language selection
-- Customizable result count
+- Safe search options
+- Customizable result count (up to 50)
+- Structured JSON responses
 
 ## License
 

@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Query (required)
   - Engine selection (auto, google, bing, duckduckgo, brave, yahoo, yandex)
   - Time range filtering (all, day, week, month, year)
-  - Number of results (1-100)
+  - Number of results (varies)
   - Location-based results
   - Language selection
 - Serpex API credentials support

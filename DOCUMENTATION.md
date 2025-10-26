@@ -4,19 +4,13 @@
 
 ## Overview
 
-This package contains the **Serpex** community node for n8n, enabling you to integrate real-time search results from multiple search engines into your n8n workflows.
+This package contains the **Serpex** community node for n8n, enabling you to integrate fast, affordable search results from multiple search engines into your n8n workflows.
 
 ### What is Serpex?
 
-[Serpex](https://serpex.dev) is a powerful API that provides search results from:
-- 🔍 Google
-- 🔍 Bing  
-- 🦆 DuckDuckGo
-- 🦁 Brave
-- 📧 Yahoo
-- 🔎 Yandex
+[Serpex](https://serpex.dev) is a powerful search API that provides structured search results with intelligent routing, automatic retries, and comprehensive data extraction. Perfect for AI applications, data collection, SEO analysis, and automated workflows.
 
-Perfect for SEO analysis, content research, market intelligence, and automated data collection.
+**10x cheaper than competitors** - Pricing starts at just $0.0008 per request.
 
 ## Installation
 
@@ -54,8 +48,8 @@ RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-serpex
 ### 1. Get Your API Key
 
 1. Sign up at [Serpex.dev](https://serpex.dev)
-2. Get your API key from the [Dashboard](https://serpex.dev/dashboard)
-3. Free tier includes 100 searches/month
+2. Get your API key from the dashboard
+3. Free tier includes 200 searches to get started
 
 ### 2. Configure Credentials in n8n
 
@@ -76,43 +70,30 @@ RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-serpex
 
 ### Search Operations
 
-- ✅ Execute search queries
-- ✅ Multi-engine support (auto-selection or manual)
+- ✅ Execute search queries with intelligent routing
+- ✅ Multi-engine support with auto-selection
 - ✅ Time-based filtering
-- ✅ Location-based results
-- ✅ Language selection
-- ✅ Customizable result count
+- ✅ Safe search options
+- ✅ Customizable result count (up to 50 pages)
+- ✅ Structured JSON responses
 
-### Supported Parameters
+### Supported Engines
 
-| Parameter | Type | Description | Default |
-|-----------|------|-------------|---------|
-| Query | string | Search query | Required |
-| Engine | dropdown | Search engine | auto |
-| Time Range | dropdown | Filter by time | all |
-| Number of Results | number | Results count | 10 |
-| Location | string | Geographic location | - |
-| Language | string | Language code | - |
-
-### Available Engines
-
-- **Auto** - Automatically selects best engine
-- **Google** - Google Search
-- **Bing** - Microsoft Bing
+- **Auto Route** - Automatically selects the best available search engine, handles blocking and captchas with retries
+- **Google** - Google's primary search engine
+- **Bing** - Microsoft Bing search
 - **DuckDuckGo** - Privacy-focused search
-- **Brave** - Brave Search
-- **Yahoo** - Yahoo Search
-- **Yandex** - Yandex (Russian search engine)
+- And more engines coming soon
 
-### Time Range Options
+### Parameters
 
-- All time
-- Past 24 hours
-- Past week
-- Past month
-- Past year
-
-*Note: Time filtering not supported by Brave*
+| Parameter | Type | Required | Description | Example |
+|-----------|------|----------|-------------|---------|
+| q | string | Yes | Search query | "coffee shops near me" |
+| category | string | No | Search category (currently 'web' only) | "web" |
+| time_range | string | No | Time filter (all, day, week, month, year) | "day" |
+| num | number | No | Number of results (max 50) | 10 |
+| safe_search | boolean | No | Enable safe search filtering | true |
 
 ## Example Workflows
 
@@ -147,10 +128,10 @@ The node returns comprehensive search data:
 ```json
 {
   "search_metadata": {
-    "id": "...",
+    "id": "search_id",
     "status": "Success",
-    "query": "your query",
-    "engine": "google"
+    "query": "your search query",
+    "engine": "auto"
   },
   "organic_results": [
     {
@@ -166,25 +147,33 @@ The node returns comprehensive search data:
 }
 ```
 
+## SDKs
+
+Serpex provides official SDKs for easy integration:
+
+### TypeScript SDK
+```bash
+npm install serpex
+```
+
+### Python SDK
+```bash
+pip install serpex
+```
+
 ## Use Cases
+
+### AI & Data Projects
+- Structured data extraction for AI training
+- Automated research and content generation
+- Market intelligence gathering
+- Competitive analysis
 
 ### SEO & Marketing
 - Track keyword rankings
 - Monitor SERP features
 - Analyze competitor content
 - Research trending topics
-
-### Data Collection
-- Gather market intelligence
-- Collect product information
-- Monitor brand mentions
-- Track news and updates
-
-### Content Research
-- Find trending topics
-- Gather source materials
-- Validate information
-- Discover content gaps
 
 ### Automation
 - Scheduled monitoring
@@ -203,7 +192,7 @@ The node returns comprehensive search data:
 
 **Issue: "No results returned"**
 - Verify your search query
-- Try a different search engine
+- Try a different engine or auto route
 - Check time range settings
 
 **Issue: "Rate limit exceeded"**
@@ -215,7 +204,7 @@ The node returns comprehensive search data:
 
 | Plan | Searches/Month | Rate Limit |
 |------|----------------|------------|
-| Free | 100 | 10/min |
+| Free | 200 | 300/sec |
 | Basic | 1,000 | 30/min |
 | Pro | 10,000 | 100/min |
 | Enterprise | Custom | Custom |
