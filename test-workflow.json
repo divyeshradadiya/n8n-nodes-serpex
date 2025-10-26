@@ -1,0 +1,76 @@
+{
+  "name": "Test Serpex Node",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "resource": "search",
+        "operation": "execute",
+        "query": "best coffee shops in New York",
+        "additionalFields": {
+          "engine": "google",
+          "num": 5
+        }
+      },
+      "name": "Serpex",
+      "type": "n8n-nodes-serpex.serpex",
+      "typeVersion": 1,
+      "position": [460, 300],
+      "credentials": {
+        "serpexApi": {
+          "id": "your-credentials-id",
+          "name": "Serpex API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Search Results",
+              "value": "={{ $json }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set Results",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Serpex",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Serpex": {
+      "main": [
+        [
+          {
+            "node": "Set Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null
+}

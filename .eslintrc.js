@@ -1,4 +1,4 @@
-{
+module.exports = {
 	"extends": ["plugin:n8n-nodes-base/community"],
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
