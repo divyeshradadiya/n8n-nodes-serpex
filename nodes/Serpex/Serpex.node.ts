@@ -248,7 +248,7 @@ export class Serpex implements INodeType {
 						qs.language = additionalFields.language;
 					}
 
-					const response = await this.helpers.requestWithAuthentication.call(
+					const response = await this.helpers.httpRequestWithAuthentication.call(
 						this,
 						'serpexApi',
 						{
