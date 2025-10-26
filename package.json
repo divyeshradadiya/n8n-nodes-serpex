@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-serpex",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "n8n community node for Serpex - Real-time search results from Google, Bing, DuckDuckGo, and more",
   "keywords": [
     "n8n-community-node-package",
