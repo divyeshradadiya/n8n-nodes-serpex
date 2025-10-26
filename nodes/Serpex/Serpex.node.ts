@@ -248,18 +248,16 @@ export class Serpex implements INodeType {
 						qs.language = additionalFields.language;
 					}
 
-					const response = await this.helpers.httpRequestWithAuthentication.call(
-						this,
-						'serpexApi',
-						{
-							method: 'GET',
-							url: '/api/search',
-							qs,
-							json: true,
-						},
-					);
-
-					returnData.push({
+				const response = await this.helpers.httpRequestWithAuthentication.call(
+					this,
+					'serpexApi',
+					{
+						method: 'GET',
+						url: 'https://api.serpex.dev/api/search',
+						qs,
+						json: true,
+					},
+				);					returnData.push({
 						json: response,
 						pairedItem: {
 							item: i,
