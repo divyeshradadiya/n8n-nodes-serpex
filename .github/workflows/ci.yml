@@ -3,6 +3,7 @@ name: CI and Publish
 permissions:
   contents: write      # required to push tags/commits
   packages: write      # optional: for package-related permissions
+  id-token: write      # npm Trusted Publishing (OIDC): no NPM_TOKEN, nothing to expire
 
 on:
   push:
@@ -49,7 +50,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         registry-url: 'https://registry.npmjs.org'
 
     - name: Install dependencies
@@ -66,9 +67,10 @@ jobs:
         git add package.json
         git commit -m "chore: bump version to $(node -p 'require(\"./package.json\").version')"
         git tag "v$(node -p 'require(\"./package.json\").version')"
-        git push --follow-tags
+        git push
+        git push origin "v$(node -p 'require("./package.json").version')" # lightweight tag: --follow-tags skips it
 
     - name: Publish to npm
-      run: npm publish --access public
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: |
+        npm install -g npm@latest # trusted publishing needs npm >= 11.5.1
+        npm publish --access public
