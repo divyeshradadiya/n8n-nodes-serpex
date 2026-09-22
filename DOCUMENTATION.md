@@ -4,13 +4,11 @@
 
 ## Overview
 
-This package contains the **Serpex** community node for n8n, enabling you to integrate fast, affordable search results from multiple search engines into your n8n workflows.
+This package contains the **Serpex** community node for n8n, bringing real-time web search results into your n8n workflows.
 
 ### What is Serpex?
 
-[Serpex](https://serpex.dev) is a powerful search API that provides structured search results with intelligent routing, automatic retries, and comprehensive data extraction. Perfect for AI applications, data collection, SEO analysis, and automated workflows.
-
-**10x cheaper than competitors** - Pricing starts at just $0.0008 per request.
+[Serpex](https://serpex.dev) is a real-time web search API that returns structured JSON search results. Built for AI agents, LLM tools, RAG pipelines and automated workflows.
 
 ## Installation
 
@@ -49,7 +47,6 @@ RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-serpex
 
 1. Sign up at [Serpex.dev](https://serpex.dev)
 2. Get your API key from the dashboard
-3. Free tier includes 200 searches to get started
 
 ### 2. Configure Credentials in n8n
 
@@ -70,30 +67,27 @@ RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-serpex
 
 ### Search Operations
 
-- ✅ Execute search queries with intelligent routing
-- ✅ Multi-engine support with auto-selection
+- ✅ Real-time web search queries
 - ✅ Time-based filtering
-- ✅ Safe search options
-- ✅ Customizable result count (up to 50 pages)
+- ✅ Customizable result count
 - ✅ Structured JSON responses
 
-### Supported Engines
+### Engine (deprecated)
 
-- **Auto Route** - Automatically selects the best available search engine, handles blocking and captchas with retries
-- **Google** - Google's primary search engine
-- **Bing** - Microsoft Bing search
-- **DuckDuckGo** - Privacy-focused search
-- And more engines coming soon
+Serpex is a single search engine, so there is nothing to select. The **Engine**
+field is deprecated and ignored by the API since 2026-06. It stays in
+**Additional Fields** (as free text) so workflows saved with an older version of
+this node keep loading and running; any value is sent as `auto`.
 
 ### Parameters
 
 | Parameter | Type | Required | Description | Example |
 |-----------|------|----------|-------------|---------|
 | q | string | Yes | Search query | "coffee shops near me" |
-| category | string | No | Search category (currently 'web' only) | "web" |
 | time_range | string | No | Time filter (all, day, week, month, year) | "day" |
-| num | number | No | Number of results (max 50) | 10 |
-| safe_search | boolean | No | Enable safe search filtering | true |
+| num | number | No | Number of results | 10 |
+| location | string | No | Location for localized results | "New York, USA" |
+| language | string | No | Language code | "en" |
 
 ## Example Workflows
 
@@ -106,7 +100,7 @@ Manual Trigger → Serpex (Query: "AI trends 2024") → Display Results
 ### 2. Automated SEO Monitoring
 
 ```
-Schedule Trigger → Serpex (Track keyword rankings) → Google Sheets → Slack Notification
+Schedule Trigger → Serpex (Track keyword rankings) → Spreadsheet → Slack Notification
 ```
 
 ### 3. Content Research
@@ -123,29 +117,32 @@ Manual Trigger → Serpex (Competitor keywords) → Analyze Data → Email Repor
 
 ## Response Format
 
-The node returns comprehensive search data:
+The node returns the Serpex API response as JSON:
 
 ```json
 {
-  "search_metadata": {
-    "id": "search_id",
-    "status": "Success",
-    "query": "your search query",
-    "engine": "auto"
+  "metadata": {
+    "number_of_results": 10,
+    "response_time": 850,
+    "timestamp": "2026-09-22T09:00:00.000Z",
+    "credits_used": 1
   },
-  "organic_results": [
+  "id": "search_id",
+  "query": "your search query",
+  "engines": ["auto"],
+  "results": [
     {
-      "position": 1,
       "title": "Page Title",
-      "link": "https://example.com",
+      "url": "https://example.com",
       "snippet": "Description...",
-      "date": "2024-01-01"
+      "position": 1,
+      "engine": "auto"
     }
-  ],
-  "related_searches": [...],
-  "people_also_ask": [...]
+  ]
 }
 ```
+
+`engines` / `engine` are legacy fields kept for compatibility.
 
 ## SDKs
 
@@ -192,7 +189,6 @@ pip install serpex
 
 **Issue: "No results returned"**
 - Verify your search query
-- Try a different engine or auto route
 - Check time range settings
 
 **Issue: "Rate limit exceeded"**
@@ -202,14 +198,7 @@ pip install serpex
 
 ## API Limits
 
-| Plan | Searches/Month | Rate Limit |
-|------|----------------|------------|
-| Free | 200 | 300/sec |
-| Basic | 1,000 | 30/min |
-| Pro | 10,000 | 100/min |
-| Enterprise | Custom | Custom |
-
-Check [Serpex Pricing](https://serpex.dev/pricing) for details.
+See [Serpex Pricing](https://serpex.dev/pricing) for plans and rate limits.
 
 ## Development
 

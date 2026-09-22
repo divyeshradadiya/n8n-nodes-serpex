@@ -14,7 +14,7 @@ export class Serpex implements INodeType {
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Get search results from Google, Bing, DuckDuckGo, and more via Serpex API',
+		description: 'Real-time web search results from the Serpex API',
 		defaults: {
 			name: 'Serpex',
 		},
@@ -96,48 +96,15 @@ export class Serpex implements INodeType {
 				},
 				options: [
 					{
-						displayName: 'Engine',
+						// Deprecated: the Serpex API ignores `engine` since 2026-06 (Serpex is a single
+						// search engine). Kept — as free text, so any value saved by an older version
+						// still loads without a validation error — and every value is sent as "auto".
+						displayName: 'Engine (Deprecated)',
 						name: 'engine',
-						type: 'options',
-						options: [
-							{
-								name: 'Auto',
-								value: 'auto',
-								description: 'Automatically select the best search engine',
-							},
-							{
-								name: 'Google',
-								value: 'google',
-								description: 'Use Google search',
-							},
-							{
-								name: 'Bing',
-								value: 'bing',
-								description: 'Use Bing search',
-							},
-							{
-								name: 'DuckDuckGo',
-								value: 'duckduckgo',
-								description: 'Use DuckDuckGo search',
-							},
-							{
-								name: 'Brave',
-								value: 'brave',
-								description: 'Use Brave search',
-							},
-							{
-								name: 'Yahoo',
-								value: 'yahoo',
-								description: 'Use Yahoo search',
-							},
-							{
-								name: 'Yandex',
-								value: 'yandex',
-								description: 'Use Yandex search',
-							},
-						],
+						type: 'string',
 						default: 'auto',
-						description: 'The search engine to use',
+						description:
+							'Deprecated and ignored. Serpex is a single search engine; kept only so existing workflows keep working.',
 					},
 					{
 						displayName: 'Time Range',
@@ -171,7 +138,7 @@ export class Serpex implements INodeType {
 							},
 						],
 						default: 'all',
-						description: 'Filter results by time range (not supported by Brave)',
+						description: 'Filter results by time range',
 					},
 					{
 						displayName: 'Number of Results',
@@ -229,7 +196,8 @@ export class Serpex implements INodeType {
 					};
 
 					if (additionalFields.engine) {
-						qs.engine = additionalFields.engine;
+						// Deprecated: any legacy value maps to "auto" (the API ignores it either way).
+						qs.engine = 'auto';
 					}
 
 					if (additionalFields.timeRange) {
