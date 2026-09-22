@@ -1,16 +1,19 @@
 {
   "name": "n8n-nodes-serpex",
   "version": "1.0.7",
-  "description": "n8n community node for Serpex - Real-time search results from Google, Bing, DuckDuckGo, and more",
+  "description": "n8n community node for Serpex \u2014 real-time web search results for your workflows",
   "keywords": [
     "n8n-community-node-package",
     "n8n",
     "serpex",
     "search",
-    "google search",
+    "search api",
+    "web search",
+    "real-time search",
     "serp",
-    "seo",
-    "web scraping"
+    "ai agents",
+    "llm",
+    "rag"
   ],
   "license": "MIT",
   "homepage": "https://github.com/divyeshradadiya/n8n-nodes-serpex",
