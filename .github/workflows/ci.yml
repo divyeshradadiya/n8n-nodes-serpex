@@ -1,4 +1,6 @@
 name: CI and Publish
+# Publishing runs on push to main via npm Trusted Publishing (OIDC); the connection must have
+# "Allow npm publish" ticked on npmjs.com, otherwise the registry answers 403 (staging only).
 
 permissions:
   contents: write      # required to push tags/commits
