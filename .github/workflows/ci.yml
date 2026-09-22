@@ -3,7 +3,8 @@ name: CI and Publish
 permissions:
   contents: write      # required to push tags/commits
   packages: write      # optional: for package-related permissions
-  id-token: write      # npm Trusted Publishing (OIDC): no NPM_TOKEN, nothing to expire
+  id-token: write      # npm Trusted Publishing (OIDC) — NO registry-url on setup-node: it writes an .npmrc with an
+# empty _authToken, npm then thinks it is authenticated and the OIDC exchange is denied (403): no NPM_TOKEN, nothing to expire
 
 on:
   push:
@@ -51,7 +52,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '24'
-        registry-url: 'https://registry.npmjs.org'
 
     - name: Install dependencies
       run: npm ci
