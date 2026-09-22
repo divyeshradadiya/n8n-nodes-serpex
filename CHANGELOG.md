@@ -15,16 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial release of n8n-nodes-serpex
-- Support for multiple search engines:
-  - Google
-  - Bing
-  - DuckDuckGo
-  - Brave
-  - Yahoo
-  - Yandex
+- Real-time web search via the Serpex API
 - Search operation with configurable parameters:
   - Query (required)
-  - Engine selection (auto, google, bing, duckduckgo, brave, yahoo, yandex)
   - Time range filtering (all, day, week, month, year)
   - Number of results (varies)
   - Location-based results
