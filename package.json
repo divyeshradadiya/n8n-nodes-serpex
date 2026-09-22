@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-serpex",
-  "version": "1.0.7",
-  "description": "n8n community node for Serpex \u2014 real-time web search results for your workflows",
+  "version": "1.0.8",
+  "description": "n8n community node for Serpex — real-time web search results for your workflows",
   "keywords": [
     "n8n-community-node-package",
     "n8n",
