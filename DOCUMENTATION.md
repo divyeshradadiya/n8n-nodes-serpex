@@ -4,11 +4,11 @@
 
 ## Overview
 
-This package contains the **Serpex** community node for n8n, bringing real-time web search results into your n8n workflows.
+This package contains the **Serpex** community node for n8n, bringing web search and page extraction into your n8n workflows.
 
 ### What is Serpex?
 
-[Serpex](https://serpex.dev) is a real-time web search API that returns structured JSON search results. Built for AI agents, LLM tools, RAG pipelines and automated workflows.
+[Serpex](https://serpex.dev) is a web search API and extract API for AI agents: ranked web results as structured JSON, optionally with page content as markdown, plus extraction of known URLs. Built for AI agents, LLM tools, RAG pipelines and automated workflows.
 
 ## Installation
 
@@ -67,27 +67,35 @@ RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-serpex
 
 ### Search Operations
 
-- ✅ Real-time web search queries
-- ✅ Time-based filtering
-- ✅ Customizable result count
-- ✅ Structured JSON responses
+- ✅ Web search queries with structured JSON responses
+- ✅ Optional page content (markdown) for the top 5 or 10 results
+- ✅ Extract 1 to 10 known URLs as markdown or HTML
+- ✅ Usage and credit balance
+- ✅ Usable as a tool by the n8n AI Agent
 
 ### Engine (deprecated)
 
 Serpex is a single search engine, so there is nothing to select. The **Engine**
-field is deprecated and ignored by the API since 2026-06. It stays in
-**Additional Fields** (as free text) so workflows saved with an older version of
-this node keep loading and running; any value is sent as `auto`.
+field is deprecated and ignored by the API since 2026-06. It is shown only on
+node version 1, so workflows saved with an older version keep loading; it is not sent.
 
 ### Parameters
 
-| Parameter | Type | Required | Description | Example |
-|-----------|------|----------|-------------|---------|
-| q | string | Yes | Search query | "coffee shops near me" |
-| time_range | string | No | Time filter (all, day, week, month, year) | "day" |
-| num | number | No | Number of results | 10 |
-| location | string | No | Location for localized results | "New York, USA" |
-| language | string | No | Language code | "en" |
+| Resource | Parameter | Type | Required | Description | Example |
+|----------|-----------|------|----------|-------------|---------|
+| Search | Query | string | Yes | Search query (max 500 characters) | "coffee shops near me" |
+| Search | Include Content | boolean | No | Also fetch page content (markdown) for the top results; a page that can't be extracted returns `content_error` | true |
+| Search | Content Results | 5 or 10 | No | How many top results get content (default 5) | 5 |
+| Extract | URLs | string | Yes | 1 to 10 URLs, separated by commas or new lines | "https://example.com" |
+| Extract | Format | markdown or html | No | Output format (default markdown) | "markdown" |
+| Usage | Days | number | No | Days of history, 1 to 90 (default 30) | 30 |
+
+### Node versions
+
+Version 2 (the default for new nodes) shows only the parameters the Serpex API uses.
+Workflows saved with version 1 keep loading: their **Additional Fields** (Engine,
+Time Range, Number of Results, Location, Language) are still shown, marked deprecated,
+and are no longer sent — the Serpex API ignores them.
 
 ## Example Workflows
 
@@ -142,7 +150,7 @@ The node returns the Serpex API response as JSON:
 }
 ```
 
-`engines` / `engine` are legacy fields kept for compatibility.
+`engines` / `engine` are deprecated response fields (always `"auto"`); they may be removed from responses later, so don't build logic on them.
 
 ## SDKs
 
@@ -189,7 +197,6 @@ pip install serpex
 
 **Issue: "No results returned"**
 - Verify your search query
-- Check time range settings
 
 **Issue: "Rate limit exceeded"**
 - Upgrade your Serpex plan

@@ -45,7 +45,15 @@ RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-serpex
 ## Operations
 
 ### Search
-- **Execute**: Run a real-time web search and get structured JSON results
+- **Execute**: Run a web search and get structured JSON results. Optional **Include Content** fetches page content (markdown) for the top 5 or 10 results.
+
+### Extract
+- **Execute**: Extract 1 to 10 known URLs as clean markdown or HTML.
+
+### Usage
+- **Get**: Request counts and the credit balance for your API key (free).
+
+The node can also be used as a tool by the n8n AI Agent.
 
 ## Credentials
 
@@ -68,23 +76,23 @@ Tested against n8n version 1.0.0 and above.
 3. Enter your search query
 4. Execute the workflow
 
-### Advanced Options
-
-- **Time Range**: Filter results by time (all, day, week, month, year)
-- **Number of Results**: How many results to return
-- **Location**: Geographic location for localized results
-- **Language**: Language code for results (e.g. en, es, fr)
-- **Engine (Deprecated)**: Ignored — Serpex is a single search engine. Kept so workflows saved with an older version keep loading; any value is sent as `auto`.
-
 ### Parameters
 
-| Parameter | Type | Required | Description | Example |
-|-----------|------|----------|-------------|---------|
-| q | string | Yes | Search query | "coffee shops near me" |
-| time_range | string | No | Time filter | "day" |
-| num | number | No | Number of results | 10 |
-| location | string | No | Location for localized results | "New York, USA" |
-| language | string | No | Language code | "en" |
+| Resource | Parameter | Type | Required | Description | Example |
+|----------|-----------|------|----------|-------------|---------|
+| Search | Query | string | Yes | Search query (max 500 characters) | "coffee shops near me" |
+| Search | Include Content | boolean | No | Also fetch page content (markdown) for the top results; a page that can't be extracted returns `content_error` | true |
+| Search | Content Results | 5 or 10 | No | How many top results get content (default 5) | 5 |
+| Extract | URLs | string | Yes | 1 to 10 URLs, separated by commas or new lines | "https://example.com" |
+| Extract | Format | markdown or html | No | Output format (default markdown) | "markdown" |
+| Usage | Days | number | No | Days of history, 1 to 90 (default 30) | 30 |
+
+### Node versions
+
+Version 2 (the default for new nodes) shows only the parameters the Serpex API uses.
+Workflows saved with version 1 keep loading: their **Additional Fields** (Engine,
+Time Range, Number of Results, Location, Language) are still shown, marked deprecated,
+and are no longer sent — the Serpex API ignores them.
 
 ### Example Workflow
 
@@ -119,7 +127,7 @@ The node returns the Serpex API response as JSON:
 }
 ```
 
-`engines` / `engine` are legacy fields kept for compatibility.
+`engines` / `engine` are deprecated response fields (always `"auto"`); they may be removed from responses later, so don't build logic on them.
 
 ## Resources
 
@@ -129,17 +137,22 @@ The node returns the Serpex API response as JSON:
 
 ## Version history
 
+### 1.1.0
+
+- Node version 2: adds Include Content / Content Results on Search, an **Extract** resource and a **Usage** resource; drops the fields the API ignores. Version 1 workflows keep loading and no longer send those fields.
+- The credential test calls the free `GET /api/usage` instead of running a billed search.
+- Usable as a tool by the n8n AI Agent.
+- Every request sends `User-Agent: serpex-n8n/<version>`.
+
 ### 1.0.8
 
-- Docs and node description: Serpex is a real-time web search API.
+- Docs and node description updated.
 - **Engine** is deprecated (ignored by the API since 2026-06). The field stays, as free text, so saved workflows keep loading; any value is sent as `auto`.
 
 ### 1.0.0
 
 Initial release with support for:
-- Real-time web search with structured JSON responses
-- Time range filtering
-- Customizable result count
+- Web search with structured JSON responses
 
 ## License
 

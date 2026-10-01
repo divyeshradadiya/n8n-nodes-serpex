@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-serpex",
-  "version": "1.0.13",
-  "description": "n8n community node for Serpex — web search for AI agents and workflows: ranked web results",
+  "version": "1.1.0-0",
+  "description": "n8n community node for Serpex — web search API and extract API for AI agents and workflows: ranked web results, page content and page extraction",
   "keywords": [
     "n8n-community-node-package",
     "n8n",
@@ -9,7 +9,7 @@
     "search",
     "search api",
     "web search",
-    "real-time search",
+    "extract",
     "serp",
     "ai agents",
     "llm",

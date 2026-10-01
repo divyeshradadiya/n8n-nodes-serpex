@@ -13,13 +13,14 @@
         "resource": "search",
         "operation": "execute",
         "query": "best coffee shops in New York",
-        "additionalFields": {
-          "num": 5
+        "options": {
+          "includeContent": true,
+          "contentResults": 5
         }
       },
       "name": "Serpex",
       "type": "n8n-nodes-serpex.serpex",
-      "typeVersion": 1,
+      "typeVersion": 2,
       "position": [460, 300],
       "credentials": {
         "serpexApi": {

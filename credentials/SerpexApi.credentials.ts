@@ -30,13 +30,14 @@ export class SerpexApi implements ICredentialType {
 		},
 	};
 
+	// GET /api/usage is free: testing the credential must not spend a search credit.
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: 'https://api.serpex.dev',
-			url: '/api/search',
+			url: '/api/usage',
 			method: 'GET',
 			qs: {
-				q: 'test',
+				days: 1,
 			},
 		},
 	};

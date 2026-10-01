@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-10-01
+
+### Added
+- Node version 2 (default for new nodes): Search gets **Include Content** / **Content Results**; new **Extract** resource (`POST /api/crawl`, 1 to 10 URLs, markdown or HTML) and **Usage** resource (`GET /api/usage`).
+- `usableAsTool: true`, so the n8n AI Agent can call the node.
+- Every request sends `User-Agent: serpex-n8n/<version>`.
+
+### Changed
+- The credential test calls the free `GET /api/usage` instead of a billed search.
+- Engine, Time Range, Number of Results, Location and Language are no longer sent (the API ignores them). They stay visible on node version 1, marked deprecated, so saved workflows load; version 2 hides them.
+- Timeouts: 60 s search, 100 s with page content, 100 s extract.
+
 ## [1.0.8] - 2026-09-22
 
 ### Changed
