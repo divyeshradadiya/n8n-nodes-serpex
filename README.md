@@ -2,7 +2,7 @@
 
 This is an n8n community node that lets you use [Serpex](https://serpex.dev) in your n8n workflows.
 
-**Serpex** is a real-time web search API. It returns structured JSON search results for any query, built for AI agents, LLM tools, RAG pipelines and automated workflows.
+**Serpex** is a web search API and extract API for AI agents. Search returns ranked web results, optionally with page content as markdown; Extract turns known URLs into clean markdown. Serpex runs its own search engine.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
