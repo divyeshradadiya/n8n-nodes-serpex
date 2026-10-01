@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-serpex",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "n8n community node for Serpex — web search for AI agents and workflows: ranked web results",
   "keywords": [
     "n8n-community-node-package",
