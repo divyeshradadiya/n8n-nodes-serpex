@@ -84,3 +84,32 @@ export function describeSerpexError(
 		}
 	}
 }
+
+/**
+ * The error body to report. The API's JSON object when there is one; a CDN
+ * or proxy error page (HTML, text, a Buffer) becomes `{ error }` with the tags
+ * stripped and at most 200 characters, or `HTTP <status>` when nothing is
+ * left. Never the whole page.
+ */
+export function errorBodyFrom(status: number, raw: unknown): SerpexErrorBody {
+	if (raw && typeof raw === 'object' && !Array.isArray(raw) && !Buffer.isBuffer(raw)) {
+		return raw as SerpexErrorBody;
+	}
+	const text = Buffer.isBuffer(raw) ? raw.toString('utf8') : typeof raw === 'string' ? raw : '';
+	if (text.trim().startsWith('{')) {
+		try {
+			const parsed: unknown = JSON.parse(text);
+			if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed as SerpexErrorBody;
+		} catch {
+			// not JSON after all: fall through to the text
+		}
+	}
+	const clean = text
+		.replace(/<(script|style)\b[\s\S]*?<\/\1\s*>/gi, ' ')
+		.replace(/<[^>]*>/g, ' ')
+		.replace(/\s+/g, ' ')
+		.trim()
+		.slice(0, 200)
+		.trim();
+	return { error: clean || `HTTP ${status}` };
+}

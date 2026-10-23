@@ -9,7 +9,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { NodeApiError, NodeOperationError } = require('n8n-workflow');
 const { Serpex, SERPEX_NODE_VERSION } = require('../dist/nodes/Serpex/Serpex.node.js');
-const { describeSerpexError } = require('../dist/nodes/Serpex/apiErrors.js');
+const { describeSerpexError, errorBodyFrom } = require('../dist/nodes/Serpex/apiErrors.js');
 
 const FIXTURES = path.join(__dirname, 'fixtures');
 const manifest = JSON.parse(fs.readFileSync(path.join(FIXTURES, 'manifest.json'), 'utf8'));
@@ -20,7 +20,7 @@ const fixture = (name) => JSON.parse(fs.readFileSync(path.join(FIXTURES, `${name
  * helper that answers like n8n's httpRequest with returnFullResponse +
  * ignoreHttpStatusErrors (it never throws on a status) — unless `throwError`.
  */
-function context({ params, typeVersion = 2, fixtureName, continueOnFail = false, throwError }) {
+function context({ params, typeVersion = 2, fixtureName, continueOnFail = false, throwError, rawResponse }) {
 	const sent = [];
 	const node = { id: '1', name: 'Serpex', type: 'n8n-nodes-serpex.serpex', typeVersion, position: [0, 0], parameters: {} };
 	const ctx = {
@@ -32,6 +32,7 @@ function context({ params, typeVersion = 2, fixtureName, continueOnFail = false,
 			httpRequestWithAuthentication: async function (credential, request) {
 				sent.push({ credential, request });
 				if (throwError) throw throwError;
+				if (rawResponse) return rawResponse;
 				const { status, headers } = manifest[fixtureName];
 				return { statusCode: status, headers, body: fixture(fixtureName) };
 			},
@@ -170,4 +171,32 @@ test('no response (network) is a NodeOperationError that says to retry', async (
 test('describeSerpexError falls back to Retry-After and a status message', () => {
 	assert.match(describeSerpexError(429, { error: 'Rate limit exceeded' }, '2').description, /Retry in 2000 ms/);
 	assert.strictEqual(describeSerpexError(524, {}).message, 'Serpex is temporarily unavailable (HTTP 524): HTTP 524.');
+});
+
+test('a non-JSON error page never becomes the message: tags stripped, 200 chars max', async () => {
+	const page =
+		'<html><head><title>502 Bad Gateway</title><style>body{color:red}</style></head>' +
+		'<body><h1>502 Bad Gateway</h1><p>' + 'x'.repeat(500) + '</p><script>alert(1)</script></body></html>';
+	const { ctx } = context({ params: search(), rawResponse: { statusCode: 502, headers: {}, body: page } });
+	await assert.rejects(new Serpex().execute.call(ctx), (err) => {
+		assert.ok(err instanceof NodeApiError);
+		assert.strictEqual(err.httpCode, '502');
+		assert.match(err.message, /^Serpex is temporarily unavailable \(HTTP 502\): 502 Bad Gateway 502 Bad Gateway x+\.$/);
+		assert.doesNotMatch(err.message, /<|>|alert|color:red/);
+		assert.ok(err.message.length < 260, `too long: ${err.message.length}`);
+		return true;
+	});
+});
+
+test('errorBodyFrom: object, JSON string, Buffer, empty', () => {
+	assert.deepStrictEqual(errorBodyFrom(400, { error: 'bad' }), { error: 'bad' });
+	assert.deepStrictEqual(errorBodyFrom(402, '{"error":"Insufficient credits","remainingCredits":0}'), {
+		error: 'Insufficient credits',
+		remainingCredits: 0,
+	});
+	assert.deepStrictEqual(errorBodyFrom(503, Buffer.from('<b>Service Unavailable</b>')), { error: 'Service Unavailable' });
+	assert.deepStrictEqual(errorBodyFrom(504, ''), { error: 'HTTP 504' });
+	assert.deepStrictEqual(errorBodyFrom(500, undefined), { error: 'HTTP 500' });
+	assert.deepStrictEqual(errorBodyFrom(502, ['not', 'an', 'object']), { error: 'HTTP 502' });
+	assert.strictEqual(errorBodyFrom(502, 'y'.repeat(1000)).error.length, 200);
 });

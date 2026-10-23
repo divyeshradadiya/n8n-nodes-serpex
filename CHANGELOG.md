@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Errors carry the Serpex API's own message and advice per HTTP status (400, 401, 402 with the balance, 429 with the wait and plan limit, 5xx with the request id) as an n8n `NodeApiError`, instead of a generic "Request failed with status code ...". With **Continue On Fail** the item carries `error`, `statusCode` and `description`.
+- A non-JSON error page (an HTML or text body from a proxy or CDN) is no longer dumped into the error: the message carries the page text with tags stripped, at most 200 characters, or `HTTP <status>` when nothing is left.
 - Typed response shapes for Search, Extract and Usage (`nodes/Serpex/types.ts`); the output is still the API's JSON.
 - The Query description lists the search operators.
 

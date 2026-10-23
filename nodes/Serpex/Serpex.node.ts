@@ -11,7 +11,7 @@ import {
 	NodeOperationError,
 } from 'n8n-workflow';
 
-import { describeSerpexError } from './apiErrors';
+import { describeSerpexError, errorBodyFrom } from './apiErrors';
 import type {
 	SerpexErrorBody,
 	SerpexExtractResponse,
@@ -433,11 +433,8 @@ export class Serpex implements INodeType {
 				)) as IN8nHttpFullResponse;
 
 				if (response.statusCode < 200 || response.statusCode >= 300) {
-					const body = (
-						response.body && typeof response.body === 'object' && !Buffer.isBuffer(response.body)
-							? response.body
-							: { error: String(response.body ?? '') }
-					) as SerpexErrorBody;
+					// The JSON error object, or a cleaned-up snippet of an HTML/text error page.
+					const body: SerpexErrorBody = errorBodyFrom(response.statusCode, response.body);
 					const retryAfter = response.headers?.['retry-after'];
 					const text = describeSerpexError(
 						response.statusCode,
