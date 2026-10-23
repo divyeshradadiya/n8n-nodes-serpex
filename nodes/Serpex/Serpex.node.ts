@@ -2,15 +2,27 @@ import {
 	IDataObject,
 	IExecuteFunctions,
 	IHttpRequestOptions,
+	IN8nHttpFullResponse,
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
+	JsonObject,
+	NodeApiError,
 	NodeOperationError,
 } from 'n8n-workflow';
 
+import { describeSerpexError } from './apiErrors';
+import type {
+	SerpexErrorBody,
+	SerpexExtractResponse,
+	SerpexSearchResponse,
+	SerpexUsageResponse,
+} from './types';
+
 // Sent as the User-Agent (serpex-n8n/<version>) so Serpex can see which node
-// versions are still in use. Keep in step with package.json.
-export const SERPEX_NODE_VERSION = '1.1.0';
+// versions are still in use. Keep in step with package.json (CI publishes
+// "<x.y.z>-0" as x.y.z).
+export const SERPEX_NODE_VERSION = '1.1.1';
 
 const BASE_URL = 'https://api.serpex.dev';
 
@@ -157,7 +169,8 @@ export class Serpex implements INodeType {
 				},
 				default: '',
 				placeholder: 'e.g., best coffee shops in New York',
-				description: 'The search query to execute (max 500 characters)',
+				description:
+					'The search query to execute (max 500 characters). Operators such as site:, -site:, after:YYYY-MM-DD and before:YYYY-MM-DD go here.',
 			},
 			// Version 1 only: these fields are ignored by the Serpex API and are no
 			// longer sent. Kept so workflows saved with version 1 still load.
@@ -411,22 +424,56 @@ export class Serpex implements INodeType {
 					);
 				}
 
-				const response = await this.helpers.httpRequestWithAuthentication.call(
+				// Read the status and body ourselves (no throw on 4xx/5xx), so the
+				// error says what the Serpex API said, not just "status code 402".
+				const response = (await this.helpers.httpRequestWithAuthentication.call(
 					this,
 					'serpexApi',
-					request,
-				);
+					{ ...request, ignoreHttpStatusErrors: true, returnFullResponse: true },
+				)) as IN8nHttpFullResponse;
+
+				if (response.statusCode < 200 || response.statusCode >= 300) {
+					const body = (
+						response.body && typeof response.body === 'object' && !Buffer.isBuffer(response.body)
+							? response.body
+							: { error: String(response.body ?? '') }
+					) as SerpexErrorBody;
+					const retryAfter = response.headers?.['retry-after'];
+					const text = describeSerpexError(
+						response.statusCode,
+						body,
+						retryAfter === undefined ? undefined : String(retryAfter),
+					);
+					throw new NodeApiError(this.getNode(), body as unknown as JsonObject, {
+						message: text.message,
+						description: text.description,
+						httpCode: String(response.statusCode),
+						itemIndex: i,
+					});
+				}
+
+				const json = response.body as unknown as
+					| SerpexSearchResponse
+					| SerpexExtractResponse
+					| SerpexUsageResponse;
 				returnData.push({
-					json: response,
+					json: json as unknown as IDataObject,
 					pairedItem: {
 						item: i,
 					},
 				});
 			} catch (error) {
+				const apiError = error instanceof NodeApiError ? error : undefined;
 				if (this.continueOnFail()) {
 					returnData.push({
 						json: {
 							error: error instanceof Error ? error.message : String(error),
+							...(apiError
+								? {
+										statusCode: Number(apiError.httpCode),
+										description: apiError.description ?? '',
+									}
+								: {}),
 						},
 						pairedItem: {
 							item: i,
@@ -434,8 +481,11 @@ export class Serpex implements INodeType {
 					});
 					continue;
 				}
+				if (apiError || error instanceof NodeOperationError) throw error;
+				// No response at all: timeout, DNS, connection reset.
 				throw new NodeOperationError(this.getNode(), error as Error, {
 					itemIndex: i,
+					description: 'Serpex could not be reached. Not charged. Retry shortly.',
 				});
 			}
 		}
