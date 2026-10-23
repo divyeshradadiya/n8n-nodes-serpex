@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-10-23
+
+### Changed
+- Errors carry the Serpex API's own message and advice per HTTP status (400, 401, 402 with the balance, 429 with the wait and plan limit, 5xx with the request id) as an n8n `NodeApiError`, instead of a generic "Request failed with status code ...". With **Continue On Fail** the item carries `error`, `statusCode` and `description`.
+- A non-JSON error page (an HTML or text body from a proxy or CDN) is no longer dumped into the error: the message carries the page text with tags stripped, at most 200 characters, or `HTTP <status>` when nothing is left.
+- Typed response shapes for Search, Extract and Usage (`nodes/Serpex/types.ts`); the output is still the API's JSON.
+- The Query description lists the search operators.
+
+### Added
+- Offline tests (`npm test`, also run in CI) against recorded API responses.
+
 ## [1.1.0] - 2026-10-01
 
 ### Added

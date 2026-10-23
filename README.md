@@ -2,7 +2,7 @@
 
 This is an n8n community node that lets you use [Serpex](https://serpex.dev) in your n8n workflows.
 
-**Serpex** is a web search API and extract API for AI agents. Search returns ranked web results, optionally with page content as markdown; Extract turns known URLs into clean markdown. Serpex runs its own search engine.
+**Serpex** is a web search API and extract API for AI agents. Search returns ranked web results, optionally with page content as markdown; Extract turns known URLs into clean markdown. Every search is routed automatically: there is no engine to choose.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
@@ -137,6 +137,13 @@ The node returns the Serpex API response as JSON:
 
 ## Version history
 
+### 1.1.1
+
+- Errors show what the Serpex API said, per status: 400 (fix the parameters), 401 (check the credential), 402 (out of credits, with the balance), 429 (rate limit, with the wait), 5xx (temporary, not charged, with the request id). With **Continue On Fail** the item carries `error`, `statusCode` and `description`.
+- Response types for Search, Extract and Usage in the source; the node still outputs the API's JSON unchanged.
+- The Query description lists the search operators (`site:`, `-site:`, `after:`, `before:`).
+- Offline tests (`npm test`) against recorded API responses.
+
 ### 1.1.0
 
 - Node version 2: adds Include Content / Content Results on Search, an **Extract** resource and a **Usage** resource; drops the fields the API ignores. Version 1 workflows keep loading and no longer send those fields.
@@ -147,7 +154,7 @@ The node returns the Serpex API response as JSON:
 ### 1.0.8
 
 - Docs and node description updated.
-- **Engine** is deprecated (ignored by the API since 2026-06). The field stays, as free text, so saved workflows keep loading; any value is sent as `auto`.
+- **Engine** is deprecated (ignored by the API since 2026-06). The field stays, as free text, so saved workflows keep loading; since 1.1.0 it is not sent.
 
 ### 1.0.0
 

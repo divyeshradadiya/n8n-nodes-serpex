@@ -75,7 +75,7 @@ RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-serpex
 
 ### Engine (deprecated)
 
-Serpex is a single search engine, so there is nothing to select. The **Engine**
+Every search is routed automatically, so there is nothing to select. The **Engine**
 field is deprecated and ignored by the API since 2026-06. It is shown only on
 node version 1, so workflows saved with an older version keep loading; it is not sent.
 
@@ -199,13 +199,29 @@ pip install serpex
 - Verify your search query
 
 **Issue: "Rate limit exceeded"**
-- Upgrade your Serpex plan
-- Implement retry logic
-- Space out your requests
+- Each plan has a per-second limit: 5, 25 or 50 requests per second
+- The error says how long to wait; enable **Retry On Fail** on the node
+- A search with page content counts as 2 (5 pages) or 3 (10 pages) requests
+
+### Error messages
+
+The node reports what the Serpex API said, by HTTP status:
+
+| Status | Message | What to do |
+|---|---|---|
+| 400 | Serpex rejected the request: ... | Fix the node parameters |
+| 401 | Serpex rejected the API key: ... | Check the Serpex API credential |
+| 402 | Out of Serpex credits. Balance: N credits. | Top up at app.serpex.dev |
+| 429 | Serpex rate limit exceeded (limit: N requests per second). | Retry after the wait in the description |
+| 5xx | Serpex is temporarily unavailable (HTTP 5xx): ... | Retry shortly; not charged |
+
+With **Continue On Fail**, the failed item carries `error`, `statusCode` and `description`
+instead of stopping the workflow.
 
 ## API Limits
 
-See [Serpex Pricing](https://serpex.dev/pricing) for plans and rate limits.
+See [Serpex rate limits](https://serpex.dev/docs/getting-started/rate-limits) and
+[pricing](https://serpex.dev/docs/getting-started/pricing).
 
 ## Development
 
